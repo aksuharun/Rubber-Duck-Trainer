@@ -14,7 +14,7 @@ async function execute(message) {
 
 async function fetchResponseContent(message) {
 	try {
-		const response = await axios.post('http://localhost:3000/gpt/var-mi', { message })
+		const response = await axios.post('http://localhost:3000/gpt/analyze-message', { message })
 		return response.data
 	} catch (error) {
 		console.error('Error fetching response content:', error)
