@@ -27,8 +27,8 @@ The project is divided into two main components:
 
 1. `discord-bot/`: Contains the Discord bot application
 	 - Detects specific keywords in messages
-	 - Communicates with the AI application
-2. `ai-application/`: Contains the AI application
+	 - Communicates with the AI service
+2. `ai-service/`: Contains the AI service
 	 - Processes messages using OpenAI's GPT-4o mini model
 	 - Generates appropriate responses
 
@@ -48,16 +48,16 @@ The project is divided into two main components:
 	 cd rubber-duck-trainer
 	 ```
 
-2. Install dependencies for both the Discord bot and AI application:
+2. Install dependencies for both the Discord bot and AI service:
 	 ```
 	 cd discord-bot
 	 npm install
-	 cd ../ai-application
+	 cd ../ai-service
 	 npm install
 	 ```
 
 3. Set up environment variables:
-	 - Copy or rename the `.env.example` file to `.env` in both `discord-bot/` and `ai-application/` directories
+	 - Copy or rename the `.env.example` file to `.env` in both `discord-bot/` and `ai-service/` directories
 	 - Fill in the required values in each `.env` file
 
 4. Configure the Discord bot:
@@ -78,9 +78,9 @@ Failure to provide these values will result in the application not functioning c
 
 ## Usage
 
-1. Start the AI application:
+1. Start the AI service:
 	 ```
-	 cd ai-application
+	 cd ai-service
 	 npm start
 	 ```
 
