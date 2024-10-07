@@ -6,6 +6,7 @@ const once = false
 
 async function execute(message) {
 	if (message.content.match(/var[ ]{0,2}m[iı]/i)) { 
+		if(message.author.bot) return
 		const response = await fetchResponseContent(message.content)
 		if(response == "0") return
 		message.reply(response)
