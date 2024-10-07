@@ -1,5 +1,5 @@
 import express from "express"
-import gptRouter from "./gpt/router.js"
+import gptRouter from "./gpt/routes.js"
 
 const app = express()
 
