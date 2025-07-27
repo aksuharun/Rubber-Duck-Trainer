@@ -1,47 +1,52 @@
-import OpenAI from "openai/index.mjs"
+import OpenAI from "openai"
 import dotenv from "dotenv"
+import { VAGUENESS_CHECK_PROMPT, WARNING_MESSAGE_PROMPT } from '../prompts/index.js'
 
 dotenv.config()
 
+const defaultModel = "gpt-4.1-nano"
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+	apiKey: process.env.OPENAI_API_KEY,
 })
 
 async function callOpenAI(systemInstruction, message, options = {}) {
-	options.model = options.model || "gpt-4o-mini"
-	options.temperature = options.temperature || 1
-	options.max_tokens = options.max_tokens || 1
-	options.top_p = options.top_p || 1
-	options.frequency_penalty = options.frequency_penalty || 0
-	options.presence_penalty = options.presence_penalty || 0
-	options.response_format = options.response_format || { type: "text" }
+	const config = {
+		model: defaultModel,
+		temperature: 1,
+		max_completion_tokens: 150,
+		top_p: 1,
+		frequency_penalty: 0,
+		presence_penalty: 0,
+		response_format: { type: "text" },
+		...options
+	};
 
 	const response = await openai.chat.completions.create({
-		model: options.model,
+		...config,
 		messages: [
-			{ role: "system", content: [{ type: "text", text: systemInstruction }]},
-			{ role: "user", content: [{ type: "text", text: message }]}
-		],
-		temperature: options.temperature,
-		max_tokens: options.max_tokens,
-		top_p: options.top_p,
-		frequency_penalty: options.frequency_penalty,
-		presence_penalty: options.presence_penalty,
-		response_format: options.response_format,
+			{
+				role: "system",
+				content: [{ type: "text", text: systemInstruction }]
+			},
+			{
+				role: "user",
+				content: [{ type: "text", text: message }]
+			}
+		]
 	})
-	return response.choices[0].message.content
+	    
+	// Adjust response parsing based on the new API structure
+	return response.choices[0].message.content || response.text
 }
 
 async function isMessageVague(message) {
-	const systemInstruction = "Senin amacın bir topluluğun yardım kısmında sorulan soruları incelemek ve eğer soru yeterince açıklanmamışsa 1 yazmak. Eğer soru yeterince açıklandıysa 0 yazmak.\n\nÖrnekler\n\nMesaj: Javascript bilen var mı?\nSenin Yanıtın: 1\n\nMesaj: Node.js projemde fs ile dosya okumaya çalışıyorum ama ENOENT hatası alıyorum. Dosya yolunu nasıl düzeltebilirim?\nSenın Yanıtın: 0"
-
-	const response = await callOpenAI(systemInstruction, message)
+	const response = await callOpenAI(VAGUENESS_CHECK_PROMPT, message)
 	return response === "1"
 }
 
 async function generateWarningMessage(message) {
-	const systemInstruction = "Senin amacın bir yazılım topluluğunun yardım kanalında yazılan, yeterince iyi açıklanmamış sorular için kullanıcıyı sorununu daha iyi açıklamaya teşvik eden kibar bir mesaj hazırlamak.\n\nAşağıdaki uyarıları dikkate al:\n- Kibar ve arkadaş canlısı olmalısın\n- ﻿Kısa ve anlaşılır bir mesaj oluşturmalısın"
-	const response = await callOpenAI(systemInstruction, message, { max_tokens: 100 })
+	const response = await callOpenAI(WARNING_MESSAGE_PROMPT, message, { max_completion_tokens: 100 })
 	return response
 }
 
